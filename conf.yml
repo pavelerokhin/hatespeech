@@ -1,0 +1,26 @@
+# output configuration
+output_file_path_twitter: output/out.csv
+
+# output fields con
+twitter_status_fields_to_report:
+  - status.created_at
+  - status.user.screen_name
+  - is_retweet
+  - is_quote
+  - text
+  - quoted_text
+twitter_status_fields_to_report_headers:
+  - created at
+  - user name
+  - is retweet
+  - is quote
+  - text
+  - quoted text
+tags:
+  - hate speech
+
+# tokens on Twitter
+customer_key: ""
+customer_secret: ""
+access_key: ""
+access_secret: ""
