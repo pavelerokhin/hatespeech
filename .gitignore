@@ -3,3 +3,4 @@
 __pycache__
 
 *.csv
+twitter_keys.yml

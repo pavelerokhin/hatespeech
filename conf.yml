@@ -18,3 +18,7 @@ twitter_status_fields_to_report_headers:
   - quoted text
 tags:
   - hate speech
+
+# output configurations
+csvPath: output/out.csv
+dbPath:  output/hatespeech.db

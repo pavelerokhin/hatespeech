@@ -1,5 +1,4 @@
 import tweepy
-import yaml
 import utils
 
 
@@ -59,18 +58,4 @@ class StreamListener(tweepy.StreamListener):
     def on_error(self, status_code):
         print("error in streaming", status_code)
 
-
-if __name__ == "__main__":
-    # get config
-    with open("conf.yml", "r") as conf_file:
-        conf = yaml.load(conf_file, Loader=yaml.FullLoader)
-        if not conf:
-            print("no configurations")
-        else:
-            with open("twitter_keys.yml", "r") as twitter_keys_file:
-                keys = yaml.load(twitter_keys_file, Loader=yaml.FullLoader)
-                if not keys:
-                    print("no Twitter keys")
-
-                stream_go(conf, keys)
 
