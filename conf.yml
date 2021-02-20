@@ -10,6 +10,7 @@ twitter_status_fields_to_report:
   - tweet_text
   - quoted_text
 twitter_status_fields_to_report_headers:
+  - user id
   - created at
   - user name
   - is retweet
@@ -18,6 +19,7 @@ twitter_status_fields_to_report_headers:
   - quoted text
 tags:
   - hate speech
+  - hate
 
 # output configurations
 csvPath: output/out.csv
