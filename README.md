@@ -1,2 +1,2 @@
 # hatespeech
-Hate speech in Twitter
+Hate speech studies in Twitter
