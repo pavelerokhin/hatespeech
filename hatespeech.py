@@ -3,7 +3,7 @@
 import yaml
 import sys
 from modules import twitterlistener as tl
-from modules.create_sql_database import orchestrate_db_connection, SQLiteConnectionError, \
+from modules.databaseaccess import orchestrate_db_connection, SQLiteConnectionError, \
     InsufficientConfigurationError
 
 if __name__ == "__main__":

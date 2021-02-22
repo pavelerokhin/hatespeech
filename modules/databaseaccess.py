@@ -1,8 +1,16 @@
 import os
+import yaml
 import sqlite3
 from sqlite3 import Error
 
-INSERT_MESSAGE_QUERY = ""
+QUERIES = {
+    "INSERT_MESSAGE_QUERY": "",
+    "RETRIEVE_TWEET_BY_ID": "",
+    "RETRIEVE_TWEET_BY_WORD_IN_TEXT": "",
+    "RETRIEVE_TWEET_BY_WORD_IN_QUOTE": "",
+}
+
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def orchestrate_db_connection(conf):
@@ -13,18 +21,18 @@ def orchestrate_db_connection(conf):
     db_exists = os.path.exists(db_file)
 
     # create connection and DB if not exist
-    conn = create_connection(db_file)
+    conn = create_db_if_needed_and_get_connection(db_file)
 
     if not db_exists:
         # TODO: control if schema has been installed
         create_schema(conn, db_file)
 
-    load_queries()  # TODO: make it without global vars
+    load_inner_queries()  # TODO: make it without global vars
 
     return conn
 
 
-def create_connection(db_file):
+def create_db_if_needed_and_get_connection(db_file):
     """
     create connection to SQLite database
     """
@@ -40,23 +48,27 @@ def create_connection(db_file):
 def execute_query(conn, query):
     try:
         c = conn.cursor()
-        c.execute(query)
+        result = c.execute(query)
         conn.commit()
+        return result
     except Error as e:
         raise QueryExecutionError("error while executing query", e)
 
 
 def create_schema(conn, db_file):
     if conn:
-        with open("db/dbschema/hatespeech_tweets.sql", "r") as schema_file:
+        with open(SCRIPT_PATH+"/../db/dbschema/hatespeech_tweets.sql", "r") as schema_file:
             create_table_sql = schema_file.read().replace("\n", " ")
         execute_query(conn, create_table_sql)
 
 
-def load_queries():
-    global INSERT_MESSAGE_QUERY
-    with open('db/queries/insert_tweet.sql') as q:
-        INSERT_MESSAGE_QUERY = q.read().replace("\n", "")
+def load_inner_queries():
+    with open(SCRIPT_PATH+"/../db/queries/queries.yml", "r") as qc:
+        query_files = yaml.load(qc)
+
+        for query_name in query_files.keys():
+            with open(SCRIPT_PATH+"/../db/queries/" + query_files.get(query_name)) as q:
+                QUERIES[query_name] = q.read().replace("\n", "")
 
 
 def create_table(conn, create_table_sql):
@@ -67,14 +79,18 @@ def create_table(conn, create_table_sql):
 
 
 def insert_tweet(conn, values):
-    global INSERT_MESSAGE_QUERY
-    populated_query = INSERT_MESSAGE_QUERY.format(*values)
+    populated_query = QUERIES["INSERT_MESSAGE_QUERY"].format(*values)
     execute_query(conn, populated_query)
+
+
+def retrieve_tweet(conn, values):
+    populated_query = QUERIES["RETRIEVE_TWEET_BY_ID"].format(*values)
+    return execute_query(conn, populated_query)
 
 
 # Exceptions
 
-class InsufficientConfigurationError(Exception):
+class InsufficientConfigurationError(Error):
     def __init__(self, message, err):
         self.message = message
         self.err = err

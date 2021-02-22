@@ -1,0 +1,4 @@
+INSERT_MESSAGE_QUERY: insert_tweet.sql
+RETRIEVE_TWEET_BY_ID: retrieve_tweet_by_id.sql
+RETRIEVE_TWEET_BY_WORD_IN_TEXT: retrieve_tweet_by_word_in_text.sql
+RETRIEVE_TWEET_BY_WORD_IN_QUOTE: retrieve_tweet_by_word_in_quote.sql

@@ -23,4 +23,4 @@ tags:
 
 # output configurations
 csvPath: output/out.csv
-dbPath:  output/hatespeech.db
+dbPath:  db/hatespeech.db
