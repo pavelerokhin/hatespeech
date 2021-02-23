@@ -1,6 +1,6 @@
 import tweepy
 import utils
-from modules.create_sql_database import insert_tweet
+from modules.databaseaccess import insert_tweet
 
 
 def stream_go(conf, keys, conn):
