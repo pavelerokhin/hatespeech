@@ -1,6 +1,11 @@
 import tweepy
 import utils
+<<<<<<< Updated upstream
 from modules.create_sql_database import insert_tweet
+=======
+from modules import nlp
+from modules.databaseaccess import insert_tweet_to_db
+>>>>>>> Stashed changes
 
 
 def stream_go(conf, keys, conn):
@@ -56,20 +61,20 @@ class StreamListener(tweepy.StreamListener):
 
         # persistence
         # TODO: data sanitization
-        to_insert = [str(user_id),
-                     created_at,
-                     screen_name.replace("'", "''"),
-                     str(is_retweet*1),
-                     str(is_quoted*1),
-                     tweet_text.replace("'", "''"),
-                     quoted_text.replace("'", "''")]
+        tweet = [str(user_id),
+                 created_at,
+                 nlp.sanitize(screen_name),
+                 str(is_retweet*1),
+                 str(is_quoted*1),
+                 nlp.sanitize(tweet_text),
+                 nlp.sanitize(quoted_text)]
         
         # write to CSV
         # TODO: print headers once here
         with open(self.conf.get('output_file_path_twitter'), "a", encoding="utf-8") as f:
-            f.write(",".join(to_insert)+"\n")
+            f.write(",".join(tweet)+"\n")
         # write to DB
-        insert_tweet(self.conn, to_insert)
+        insert_tweet_to_db(self.conn, tweet)
 
     def on_error(self, status_code):
         print("error in streaming", status_code)
