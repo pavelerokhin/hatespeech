@@ -1,11 +1,7 @@
 import tweepy
 import utils
-<<<<<<< Updated upstream
-from modules.create_sql_database import insert_tweet
-=======
 from modules import nlp
 from modules.databaseaccess import insert_tweet_to_db
->>>>>>> Stashed changes
 
 
 def stream_go(conf, keys, conn):
