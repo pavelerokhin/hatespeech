@@ -53,12 +53,12 @@ class TestDBActions(unittest.TestCase):
                 .execute_query(conn, "SELECT COUNT(*) FROM tweets")\
                 .fetchone()[0]
 
-            self.assertEquals(count_before, 0)
-            self.assertEquals(count_after, 1)
+            self.assertEqual(count_before, 0)
+            self.assertEqual(count_after, 1)
         finally:
             cleanup(conn)
 
-    def test_retrieve_from_db(self):
+    def test_retrieve_from_db_by_id(self):
         global db_file
 
         does_db_exist = os.path.exists(db_file)
@@ -81,7 +81,7 @@ class TestDBActions(unittest.TestCase):
                           '']
             databaseaccess.insert_tweet(conn, test_tweet)
 
-            result = databaseaccess.retrieve_tweet(conn, ["1"])
+            result = databaseaccess.retrieve_tweet_by_id(conn, ["1"])
             result = list(result.fetchone())
             self.assertTrue((len(result)-1) == len(test_tweet))
             unittest.TestCase.assertListEqual(self,
@@ -90,6 +90,69 @@ class TestDBActions(unittest.TestCase):
         finally:
             cleanup(conn)
 
+    def test_retrieve_from_db_by_tweet_text(self):
+        global db_file
+
+        does_db_exist = os.path.exists(db_file)
+        if does_db_exist:
+            os.remove(db_file)
+        conn = None
+        try:
+            # create connection and test DB if not exist
+            conn = databaseaccess.create_db_if_needed_and_get_connection(db_file)
+            databaseaccess.create_schema(conn, db_file)
+            databaseaccess.load_inner_queries()
+
+            # insert fake tweet
+            test_tweet = [1136432762729222144,
+                          20210220223527,
+                          'USERNAME',
+                          1,
+                          0,
+                          'MESSAGE message m-e-s-s-a-g-e',
+                          'QUOTE quote q-u-o-t-e']
+            databaseaccess.insert_tweet(conn, test_tweet)
+
+            result = databaseaccess.retrieve_tweet_by_tweet_text(conn, ["message"])
+            result = list(result.fetchone())
+            self.assertTrue((len(result)-1) == len(test_tweet))
+            unittest.TestCase.assertListEqual(self,
+                                              list1=result[1:],
+                                              list2=test_tweet)
+        finally:
+            cleanup(conn)
+
+    def test_retrieve_from_db_by_quote_text(self):
+        global db_file
+
+        does_db_exist = os.path.exists(db_file)
+        if does_db_exist:
+            os.remove(db_file)
+        conn = None
+        try:
+            # create connection and test DB if not exist
+            conn = databaseaccess.create_db_if_needed_and_get_connection(db_file)
+            databaseaccess.create_schema(conn, db_file)
+            databaseaccess.load_inner_queries()
+
+            # insert fake tweet
+            test_tweet = [1136432762729222144,
+                          20210220223527,
+                          'USERNAME',
+                          1,
+                          0,
+                          'MESSAGE message m-e-s-s-a-g-e',
+                          'QUOTE quote q-u-o-t-e']
+            databaseaccess.insert_tweet(conn, test_tweet)
+
+            result = databaseaccess.retrieve_tweet_by_quote_text(conn, ["quote"])
+            result = list(result.fetchone())
+            self.assertTrue((len(result)-1) == len(test_tweet))
+            unittest.TestCase.assertListEqual(self,
+                                              list1=result[1:],
+                                              list2=test_tweet)
+        finally:
+            cleanup(conn)
 
 def cleanup(conn):
     global db_file

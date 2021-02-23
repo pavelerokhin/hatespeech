@@ -6,8 +6,8 @@ from sqlite3 import Error
 QUERIES = {
     "INSERT_MESSAGE_QUERY": "",
     "RETRIEVE_TWEET_BY_ID": "",
-    "RETRIEVE_TWEET_BY_WORD_IN_TEXT": "",
-    "RETRIEVE_TWEET_BY_WORD_IN_QUOTE": "",
+    "RETRIEVE_TWEET_BY_WORDS_IN_TEXT": "",
+    "RETRIEVE_TWEET_BY_WORDS_IN_QUOTE": "",
 }
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -57,25 +57,22 @@ def execute_query(conn, query):
 
 def create_schema(conn, db_file):
     if conn:
-        with open(SCRIPT_PATH+"/../db/dbschema/hatespeech_tweets.sql", "r") as schema_file:
-            create_table_sql = schema_file.read().replace("\n", " ")
-        execute_query(conn, create_table_sql)
+        schema_path = SCRIPT_PATH+"/../db/dbschema/"
+        schema_scripts = [schema_path + script_name for script_name in os.listdir(schema_path)]
+
+        for ss in schema_scripts:
+            with open(ss, "r") as schema_file:
+                schema_script = schema_file.read().replace("\n", " ")
+            execute_query(conn, schema_script)
 
 
 def load_inner_queries():
     with open(SCRIPT_PATH+"/../db/queries/queries.yml", "r") as qc:
-        query_files = yaml.load(qc)
+        query_files = yaml.load(qc, Loader=yaml.FullLoader)
 
         for query_name in query_files.keys():
             with open(SCRIPT_PATH+"/../db/queries/" + query_files.get(query_name)) as q:
                 QUERIES[query_name] = q.read().replace("\n", "")
-
-
-def create_table(conn, create_table_sql):
-    """
-    create table from the create_table_sql
-    """
-    execute_query(create_table_sql)
 
 
 def insert_tweet(conn, values):
@@ -83,13 +80,22 @@ def insert_tweet(conn, values):
     execute_query(conn, populated_query)
 
 
-def retrieve_tweet(conn, values):
+def retrieve_tweet_by_id(conn, values):
     populated_query = QUERIES["RETRIEVE_TWEET_BY_ID"].format(*values)
     return execute_query(conn, populated_query)
 
 
-# Exceptions
+def retrieve_tweet_by_tweet_text(conn, values):
+    populated_query = QUERIES["RETRIEVE_TWEET_BY_WORDS_IN_TEXT"].format(*values)
+    return execute_query(conn, populated_query)
 
+
+def retrieve_tweet_by_quote_text(conn, values):
+    populated_query = QUERIES["RETRIEVE_TWEET_BY_WORDS_IN_QUOTE"].format(*values)
+    return execute_query(conn, populated_query)
+
+
+# Exceptions
 class InsufficientConfigurationError(Error):
     def __init__(self, message, err):
         self.message = message
@@ -106,5 +112,3 @@ class QueryExecutionError(Error):
     def __init__(self, message, err):
         self.message = message
         self.err = err
-
-
