@@ -4,9 +4,20 @@ INSERT INTO tweets (
         created_at,
         screen_name,
         is_retweet,
-        is_retweet,
+        is_quoted,
         tweet_text,
         quoted_text
     )
 VALUES
+<<<<<<< HEAD
     ({}, {}, {}, '{}', {}, {}, '{}', '{}')
+=======
+    ((SELECT IFNULL(MAX(id),0)+1 FROM tweets),
+    {},
+    {},
+    '{}',
+    {},
+    {},
+    '{}',
+    '{}')
+>>>>>>> main

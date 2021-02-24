@@ -75,7 +75,11 @@ def load_inner_queries():
                 QUERIES[query_name] = q.read().replace("\n", "")
 
 
+<<<<<<< HEAD
 def insert_tweet_to_db(conn, values):
+=======
+def insert_tweet(conn, values):
+>>>>>>> main
     populated_query = QUERIES["INSERT_MESSAGE_QUERY"].format(*values)
     execute_query(conn, populated_query)
 

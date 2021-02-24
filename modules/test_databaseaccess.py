@@ -47,6 +47,7 @@ class TestDBActions(unittest.TestCase):
                           0,
                           'MESSAGE',
                           '']
+
             databaseaccess.insert_tweet_to_db(conn, test_tweet)
 
             count_after = databaseaccess\
@@ -79,6 +80,7 @@ class TestDBActions(unittest.TestCase):
                           0,
                           'MESSAGE',
                           '']
+
             databaseaccess.insert_tweet_to_db(conn, test_tweet)
 
             result = databaseaccess.retrieve_tweet_by_id(conn, ["1"])
@@ -111,6 +113,7 @@ class TestDBActions(unittest.TestCase):
                           0,
                           'MESSAGE message m-e-s-s-a-g-e',
                           'QUOTE quote q-u-o-t-e']
+
             databaseaccess.insert_tweet_to_db(conn, test_tweet)
 
             result = databaseaccess.retrieve_tweet_by_tweet_text(conn, ["message"])
@@ -143,7 +146,9 @@ class TestDBActions(unittest.TestCase):
                           0,
                           'MESSAGE message m-e-s-s-a-g-e',
                           'QUOTE quote q-u-o-t-e']
+
             databaseaccess.insert_tweet_to_db(conn, test_tweet)
+
 
             result = databaseaccess.retrieve_tweet_by_quote_text(conn, ["quote"])
             result = list(result.fetchone())
