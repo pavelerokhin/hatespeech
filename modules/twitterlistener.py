@@ -30,10 +30,11 @@ def stream_go(conf, keys, conn):
 class StreamListener(tweepy.StreamListener):
     # Stream listener lass inherits from tweepy.StreamListener
     # and overwrites on_status/on_error method
-    def __init__(self, configuration, db_connection):
+    def __init__(self, configuration, db_connection, last_id):
         super(StreamListener, self).__init__()
         self.conf = configuration
         self.conn = db_connection
+        self.last_id = last_id
 
     def on_status(self, status):
         print("new item:", status.text)
@@ -48,23 +49,30 @@ class StreamListener(tweepy.StreamListener):
         user_id = status.author.id
 
         tweet_text = utils.get_full_text(status, is_extended)
-        tweet_text = utils.cleanup(tweet_text)
-
+        tweet_text = nlp.sanitize(tweet_text)
         quoted_text = ""
         if is_quoted:
             quoted_text = utils.get_full_text(status.quoted_status, is_quote_truncated)
-            quoted_text = utils.cleanup(quoted_text)
+            quoted_text = nlp.sanitize(quoted_text)
+
+        entities_in_tweet = nlp.extract_entities(tweet_text)
+        entities_in_quote = nlp.extract_entities(quoted_text) if quoted_text else []
 
         # persistence
         # TODO: data sanitization
-        tweet = [str(user_id),
+        self.last_id += 1
+        tweet = [str(self.last_id),
+                 str(user_id),
                  created_at,
-                 nlp.sanitize(screen_name),
+                 screen_name,
                  str(is_retweet*1),
                  str(is_quoted*1),
-                 nlp.sanitize(tweet_text),
+                 tweet_text,
                  nlp.sanitize(quoted_text)]
-        
+
+        print("entities in tweet", entities_in_tweet)
+        print("entities in quotation", entities_in_quote)
+
         # write to CSV
         # TODO: print headers once here
         with open(self.conf.get('output_file_path_twitter'), "a", encoding="utf-8") as f:

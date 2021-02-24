@@ -9,5 +9,4 @@ INSERT INTO tweets (
         quoted_text
     )
 VALUES
-    ((SELECT IFNULL(MAX(id),0)+1 FROM tweets),
-    {}, {}, '{}', {}, {}, '{}', '{}')
+    ({}, {}, {}, '{}', {}, {}, '{}', '{}')

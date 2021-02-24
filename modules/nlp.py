@@ -1,3 +1,8 @@
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+WHITESPACE = " "
 
 
 def sanitize(text):
@@ -17,14 +22,16 @@ def sanitize_punctuation_and_white_spaces(text):
     removes unnecessary punctuation and white spaces
     """
     words = text.lower()\
+        .replace("\n", WHITESPACE)\
+        .replace(",", WHITESPACE)\
         .replace(",./\\", "")\
-        .split(r'\W+', text)
+        .split()
 
     return "".join(words)
 
-def sentiment(text):
-
-    pass
+def extract_entities(text):
+    doc = nlp(text)
+    return doc.ents
 
 def extract_tweet_components(text):
     #extract hashtags
