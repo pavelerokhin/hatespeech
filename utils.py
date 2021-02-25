@@ -15,12 +15,6 @@ def get_full_text(status, is_extended):
     return retweeted_status_extended_tweet_text
 
 
-
-def cleanup(text):
-    whitespace = " "
-    return text.replace("\n", whitespace).replace(",", whitespace)
-
-
 def write_csv_header(conf):
     with open(conf.get('output_file_path_twitter'), "w") as f:
         f.write(",".join(conf.get('twitter_status_fields_to_report_headers'))+"\n")

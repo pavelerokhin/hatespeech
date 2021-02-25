@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS tweets (
-    id integer PRIMARY KEY,
+    tweet_id integer PRIMARY KEY,
     user_id integer,
     created_at integer,
     screen_name text,

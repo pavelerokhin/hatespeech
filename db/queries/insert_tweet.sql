@@ -1,5 +1,5 @@
 INSERT INTO tweets (
-        id,
+        tweet_id,
         user_id,
         created_at,
         screen_name,
@@ -9,11 +9,4 @@ INSERT INTO tweets (
         quoted_text
     )
 VALUES
-    ((SELECT IFNULL(MAX(id),0)+1 FROM tweets),
-    {},
-    {},
-    '{}',
-    {},
-    {},
-    '{}',
-    '{}')
+    ({}, {}, {}, '{}', {}, {}, '{}', '{}')
