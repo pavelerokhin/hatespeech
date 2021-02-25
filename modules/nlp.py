@@ -27,11 +27,15 @@ def sanitize_punctuation_and_white_spaces(text):
         .replace(",./\\", "")\
         .split()
 
-    return "".join(words)
+    return " ".join(words)
+
 
 def extract_entities(text):
-    doc = nlp(text)
-    return doc.ents
+    if text:
+        doc = nlp(text)
+        return doc.ents if doc.ents else []
+    return []
+
 
 def extract_tweet_components(text):
     #extract hashtags

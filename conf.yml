@@ -20,6 +20,8 @@ twitter_status_fields_to_report_headers:
 tags:
   - hate speech
   - hate
+language:
+  - en
 
 # output configurations
 csvPath: output/out.csv

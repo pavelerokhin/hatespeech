@@ -1,3 +1,3 @@
 SELECT *
  FROM tweets t
- WHERE t.id = {}
+ WHERE t.tweet_id = {}

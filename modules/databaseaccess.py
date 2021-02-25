@@ -8,6 +8,9 @@ QUERIES = {
     "RETRIEVE_TWEET_BY_ID": "",
     "RETRIEVE_TWEET_BY_WORDS_IN_TEXT": "",
     "RETRIEVE_TWEET_BY_WORDS_IN_QUOTE": "",
+    "GET_LAST_TWEET_ID": "",
+    "INSERT_ENTITY": "",
+    "GET_LAST_ENTITY_ID": "",
 }
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -75,12 +78,24 @@ def load_inner_queries():
                 QUERIES[query_name] = q.read().replace("\n", "")
 
 
-<<<<<<< HEAD
+def get_last_id(conn):
+    result = execute_query(conn, QUERIES["GET_LAST_TWEET_ID"])
+    return result.fetchone()[0]
+
+
+def get_last_entity_id(conn):
+    result = execute_query(conn, QUERIES["GET_LAST_ENTITY_ID"])
+    return result.fetchone()[0]
+
+
 def insert_tweet_to_db(conn, values):
-=======
-def insert_tweet(conn, values):
->>>>>>> main
     populated_query = QUERIES["INSERT_MESSAGE_QUERY"].format(*values)
+    execute_query(conn, populated_query)
+
+
+def insert_entities_to_db(conn, values):
+    last_entity_id = get_last_entity_id(conn) + 1
+    populated_query = QUERIES["INSERT_ENTITY"].format(*[last_entity_id, *values])
     execute_query(conn, populated_query)
 
 

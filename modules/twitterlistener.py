@@ -1,8 +1,8 @@
 import tweepy
 import utils
 
-from modules import nlp
-from modules.databaseaccess import insert_tweet_to_db
+from modules import nlp, databaseaccess
+from modules.databaseaccess import insert_tweet_to_db, insert_entities_to_db
 
 
 def stream_go(conf, keys, conn):
@@ -18,14 +18,15 @@ def stream_go(conf, keys, conn):
     api = tweepy.API(auth_handler=auth)
 
     # stream
-    stream_listener = StreamListener(conf, conn)
+    last_id = databaseaccess.get_last_id(conn)
+    stream_listener = StreamListener(conf, conn, last_id)
     stream = tweepy.Stream(auth=api.auth, listener=stream_listener, tweet_mode='extended')
 
     # headers
     utils.write_csv_header(conf)
 
     # go!
-    stream.filter(track=conf.get('tags'))
+    stream.filter(languages=conf.get('language'), track=conf.get('tags'))
 
 
 class StreamListener(tweepy.StreamListener):
@@ -50,18 +51,23 @@ class StreamListener(tweepy.StreamListener):
         user_id = status.author.id
 
         tweet_text = utils.get_full_text(status, is_extended)
-        tweet_text = nlp.sanitize(tweet_text)
         quoted_text = ""
         if is_quoted:
             quoted_text = utils.get_full_text(status.quoted_status, is_quote_truncated)
             quoted_text = nlp.sanitize(quoted_text)
 
-        entities_in_tweet = nlp.extract_entities(tweet_text)
-        entities_in_quote = nlp.extract_entities(quoted_text) if quoted_text else []
+        extracted_entities_in_tweet = nlp.extract_entities(tweet_text)
+        extracted_entities_in_quote = nlp.extract_entities(quoted_text)
+        entities_tweet = []
+        entities_quote = []
+
+        tweet_text = nlp.sanitize(tweet_text)
+        quoted_text = nlp.sanitize(quoted_text)
 
         # persistence
         # TODO: data sanitization
         self.last_id += 1
+
         tweet = [str(self.last_id),
                  str(user_id),
                  created_at,
@@ -71,8 +77,25 @@ class StreamListener(tweepy.StreamListener):
                  tweet_text,
                  nlp.sanitize(quoted_text)]
 
-        print("entities in tweet", entities_in_tweet)
-        print("entities in quotation", entities_in_quote)
+        if extracted_entities_in_tweet:
+            for et in extracted_entities_in_tweet:
+                entities_tweet.append([
+                    self.last_id,
+                    et.text,
+                    et.label,
+                    et.label_
+                ])
+            print("entities in tweet", entities_tweet)
+
+        if extracted_entities_in_quote:
+            for eq in extracted_entities_in_quote:
+                entities_quote.append([
+                    self.last_id,
+                    nlp.sanitize(eq.text),
+                    eq.label,
+                    eq.label_
+                ])
+            print("entities in quotation", entities_quote)
 
         # write to CSV
         # TODO: print headers once here
@@ -80,6 +103,9 @@ class StreamListener(tweepy.StreamListener):
             f.write(",".join(tweet)+"\n")
         # write to DB
         insert_tweet_to_db(self.conn, tweet)
+        if entities_tweet:
+            for et in entities_tweet:
+                insert_entities_to_db(self.conn, et)
 
     def on_error(self, status_code):
         print("error in streaming", status_code)

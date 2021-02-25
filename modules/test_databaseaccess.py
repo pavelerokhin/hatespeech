@@ -40,7 +40,8 @@ class TestDBActions(unittest.TestCase):
                 .fetchone()[0]
 
             # insert fake tweet
-            test_tweet = [1136432762729222144,
+            test_tweet = [1,
+                          1136432762729222144,
                           20210220223527,
                           'USERNAME',
                           1,
@@ -73,7 +74,8 @@ class TestDBActions(unittest.TestCase):
             databaseaccess.load_inner_queries()
 
             # insert fake tweet
-            test_tweet = [1136432762729222144,
+            test_tweet = [1,
+                          1136432762729222144,
                           20210220223527,
                           'USERNAME',
                           1,
@@ -85,9 +87,9 @@ class TestDBActions(unittest.TestCase):
 
             result = databaseaccess.retrieve_tweet_by_id(conn, ["1"])
             result = list(result.fetchone())
-            self.assertTrue((len(result)-1) == len(test_tweet))
+            self.assertTrue(len(result) == len(test_tweet))
             unittest.TestCase.assertListEqual(self,
-                                              list1=result[1:],
+                                              list1=result,
                                               list2=test_tweet)
         finally:
             cleanup(conn)
@@ -106,7 +108,8 @@ class TestDBActions(unittest.TestCase):
             databaseaccess.load_inner_queries()
 
             # insert fake tweet
-            test_tweet = [1136432762729222144,
+            test_tweet = [1,
+                          1136432762729222144,
                           20210220223527,
                           'USERNAME',
                           1,
@@ -118,9 +121,9 @@ class TestDBActions(unittest.TestCase):
 
             result = databaseaccess.retrieve_tweet_by_tweet_text(conn, ["message"])
             result = list(result.fetchone())
-            self.assertTrue((len(result)-1) == len(test_tweet))
+            self.assertTrue(len(result) == len(test_tweet))
             unittest.TestCase.assertListEqual(self,
-                                              list1=result[1:],
+                                              list1=result,
                                               list2=test_tweet)
         finally:
             cleanup(conn)
@@ -139,7 +142,8 @@ class TestDBActions(unittest.TestCase):
             databaseaccess.load_inner_queries()
 
             # insert fake tweet
-            test_tweet = [1136432762729222144,
+            test_tweet = [1,
+                          1136432762729222144,
                           20210220223527,
                           'USERNAME',
                           1,
@@ -149,12 +153,11 @@ class TestDBActions(unittest.TestCase):
 
             databaseaccess.insert_tweet_to_db(conn, test_tweet)
 
-
             result = databaseaccess.retrieve_tweet_by_quote_text(conn, ["quote"])
             result = list(result.fetchone())
-            self.assertTrue((len(result)-1) == len(test_tweet))
+            self.assertTrue(len(result) == len(test_tweet))
             unittest.TestCase.assertListEqual(self,
-                                              list1=result[1:],
+                                              list1=result,
                                               list2=test_tweet)
         finally:
             cleanup(conn)
