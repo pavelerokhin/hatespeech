@@ -22,6 +22,8 @@ tags:
   - hate
 language:
   - en
+#timeout: 5
+max_messages: 5
 
 # output configurations
 csvPath: output/out.csv

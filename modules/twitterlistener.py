@@ -20,7 +20,10 @@ def stream_go(conf, keys, conn):
     # stream
     last_id = databaseaccess.get_last_id(conn)
     stream_listener = StreamListener(conf, conn, last_id)
-    stream = tweepy.Stream(auth=api.auth, listener=stream_listener, tweet_mode='extended')
+    stream = tweepy.Stream(auth=api.auth,
+                           listener=stream_listener,
+                           tweet_mode='extended',
+                           timeout=conf.get("timeout"))
 
     # headers
     utils.write_csv_header(conf)
@@ -37,9 +40,18 @@ class StreamListener(tweepy.StreamListener):
         self.conf = configuration
         self.conn = db_connection
         self.last_id = last_id
+        self.messages_counter = 0
+        self.max_messages = configuration.get("max_messages")
 
     def on_status(self, status):
-        print("new item:", status.text)
+
+        if self.max_messages and self.messages_counter >= self.max_messages:
+            print(f"Max number of messages {self.max_messages} reached")
+            return False
+
+        self.messages_counter += 1
+        nl = '\n'
+        print(f"{self.messages_counter} new item: {status.text.replace(nl, ' ')}")
         is_retweet = hasattr(status, "retweeted_status")
         is_extended = hasattr(status, "extended_tweet")
         is_quoted = hasattr(status, "quoted_status")
