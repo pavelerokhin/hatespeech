@@ -1,6 +1,8 @@
 import spacy
+import re
 
 nlp = spacy.load("en_core_web_sm")
+TWITTER_LINK = r'https://t.co/.*'
 
 WHITESPACE = " "
 
@@ -21,13 +23,17 @@ def sanitize_punctuation_and_white_spaces(text):
     """
     removes unnecessary punctuation and white spaces
     """
-    words = text.lower()\
-        .replace("\n", WHITESPACE)\
+    words = text.replace("\n", WHITESPACE)\
         .replace(",", WHITESPACE)\
-        .replace(",./\\", "")\
+        .replace(",./\\\"", "")\
         .split()
 
-    return " ".join(words)
+    return " ".join([(w.lower() if not re.match(TWITTER_LINK, w) else w) for w in words])
+
+
+def extract_twitter_links(text):
+    words = text.split()
+    return [w for w in words if re.match(TWITTER_LINK, w)]
 
 
 def extract_entities(text):

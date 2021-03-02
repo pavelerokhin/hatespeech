@@ -11,6 +11,8 @@ QUERIES = {
     "GET_LAST_TWEET_ID": "",
     "INSERT_ENTITY": "",
     "GET_LAST_ENTITY_ID": "",
+    "GET_LAST_TWEET_LINK_ID": "",
+    "INSERT_TWEET_LINK": "",
 }
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -88,6 +90,11 @@ def get_last_entity_id(conn):
     return result.fetchone()[0]
 
 
+def get_last_tweet_link_id(conn):
+    result = execute_query(conn, QUERIES["GET_LAST_TWEET_LINK_ID"])
+    return result.fetchone()[0]
+
+
 def insert_tweet_to_db(conn, values):
     populated_query = QUERIES["INSERT_MESSAGE_QUERY"].format(*values)
     execute_query(conn, populated_query)
@@ -96,6 +103,13 @@ def insert_tweet_to_db(conn, values):
 def insert_entities_to_db(conn, values):
     last_entity_id = get_last_entity_id(conn) + 1
     populated_query = QUERIES["INSERT_ENTITY"].format(*[last_entity_id, *values])
+    execute_query(conn, populated_query)
+
+
+def insert_tweet_link_to_db(conn, tweet_id, link, is_quote):
+    last_tweet_link_id = get_last_tweet_link_id(conn) + 1
+    populated_query = QUERIES["INSERT_TWEET_LINK"].format(tweet_id, last_tweet_link_id, link,
+                                                          is_quote)
     execute_query(conn, populated_query)
 
 
