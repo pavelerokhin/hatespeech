@@ -2,7 +2,9 @@ import tweepy
 import utils
 
 from modules import nlp, databaseaccess
-from modules.databaseaccess import insert_tweet_to_db, insert_entities_to_db
+from modules.databaseaccess import insert_tweet_to_db, insert_entities_to_db, \
+    insert_tweet_link_to_db
+from modules.nlp import extract_twitter_links
 
 
 def stream_go(conf, keys, conn):
@@ -76,11 +78,15 @@ class StreamListener(tweepy.StreamListener):
         tweet_text = nlp.sanitize(tweet_text)
         quoted_text = nlp.sanitize(quoted_text)
 
+        tweet_id = status.id
+        links_in_tweet = extract_twitter_links(tweet_text)
+        links_in_quote = extract_twitter_links(quoted_text)
+
         # persistence
         # TODO: data sanitization
         self.last_id += 1
 
-        tweet = [str(self.last_id),
+        tweet = [str(tweet_id),
                  str(user_id),
                  created_at,
                  screen_name,
@@ -93,7 +99,7 @@ class StreamListener(tweepy.StreamListener):
             for et in extracted_entities_in_tweet:
                 entities_tweet.append([
                     self.last_id,
-                    et.text,
+                    nlp.sanitize(et.text),
                     et.label,
                     et.label_
                 ])
@@ -113,11 +119,20 @@ class StreamListener(tweepy.StreamListener):
         # TODO: print headers once here
         with open(self.conf.get('output_file_path_twitter'), "a", encoding="utf-8") as f:
             f.write(",".join(tweet)+"\n")
+
         # write to DB
         insert_tweet_to_db(self.conn, tweet)
         if entities_tweet:
             for et in entities_tweet:
                 insert_entities_to_db(self.conn, et)
+
+        if links_in_tweet:
+            for lt in links_in_tweet:
+                insert_tweet_link_to_db(self.conn, self.last_id, lt, 0)
+
+        if links_in_quote:
+            for lt in links_in_quote:
+                insert_tweet_link_to_db(self.conn, self.last_id, lt, 1)
 
     def on_error(self, status_code):
         print("error in streaming", status_code)
